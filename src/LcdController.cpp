@@ -9,6 +9,7 @@
 
 LcdController::LcdController() {
     lcd = new upm::Jhd1313m1(6, LCD_ADDRESS, RGB_ADDRESS);
+    lcd->setColor(10,10,10);
 }
 
 void LcdController::SetLine1(string input) {

@@ -43,6 +43,10 @@ Online project archive:
 
 \section{What is E27radio}
 E27radio is a device that makes internet radio accessible to everybody. It enables people from around the world to listen to music and news from many countries around the world. The E27 radio is extremely simple to use once it has been configured properly, so it can be used by anybody, no matter age or education. 
+\begin{figure}[h]
+	\includegraphics[width=400px]{images/overview}
+	\caption{E27 radio}
+\end{figure}
 
 \section{Background}
 E27radio was developed as an entry for the Elektor Edison Challenge (end of 2015). I wanted to improve my software development skills for this type of devices, that's why I decided to take part in this competition.
@@ -70,7 +74,7 @@ E27radio is build on the Intel Edison platform.
 It uses the onboard Wifi to connect to the Internet , so it can connect to Internet radio stations around the world. Audio output is provided by connecting via Bluetooth to an external speaker.
 The user interface consists of a small LCD and a number of push buttons
 
-The application software runs on Yocto Linux (the default for Intel Edison) and is developed in C++.
+The application software runs on Yocto Linux (the default for Intel Edison) and is written in C++.
 
 \begin{figure}[h]
 	\includegraphics[height=400px]{images/architecture}
@@ -101,7 +105,7 @@ In order to play  audio, I decided to use 'mpg123' . Unfortunately this software
 Thus I decided to set up my own BitBake environment. 
 I downloaded the Intel Edison image source from the Intel Edison website and followed the instructions to build the default edison image on my Linux Ubuntu 14.04 PC. 
 The initial bitbake takes a lot of time (it builds everything from source) and a LOT of space ( you will need several GigaBytes). 
-Once this toolchain worked, I added the recipe for 'mpg123' to the bitbake configuration and I made sure that 'mpg123' uses Pulse audio as default and not Alsa. I could then create a new image for the Edison and flash it on to the board. Once the new image was running on the Intel edison, I configured the Intel Edison to connect to my local WiFi network.(see the Intel Edison website for more information). But we are not done yet: we still need to connect the Intel Edison to the Bluetooth speaker.
+Once this toolchain worked, I added the recipe for 'mpg123' to the bitbake configuration and I made sure that 'mpg123' uses Pulse audio as default and not Alsa. I could then create a new image for the Edison and flash it on to the board. Once the new image was running on the Intel Edison, I configured the Intel Edison to connect to my local WiFi network(see the Intel Edison website for more information). But we are not done yet: we still need to connect the Intel Edison to the Bluetooth speaker.
 
 Let's go through the manual Bluetooth configuration step-by-step:
 
@@ -221,6 +225,7 @@ This also enables easy extensions of the sourcecode in the future.
 \chapter{Conclusion}
 The development of the E27radio was a bumpy road, but it works quite well in the end. I just had enough time to finish a first basic prototype of E27-radio in time for the contest and I already identified quite a few things that still need to be done :
 \begin{itemize}
+	\item Include e27radio bitbake recipe in the image
 	\item Implement/improve exception handling in software 
 	(currently only 'happy flow' is supported)
 	\item Simplify setup procedure (currently the initial setup needs to be done via the command line , for example pairing the Intel Edison with a Bluetooth device).

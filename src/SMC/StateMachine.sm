@@ -1,0 +1,24 @@
+
+%class  StateMachine
+%header StateMachine.h
+
+%start Map1::Stopped
+
+%map Map1
+%%
+// State		Transition		End State	Action(s)
+Stopped
+{
+                        Button1Pressed          Playing         {StartPlaying();}
+                        Button2Pressed          nil        {}
+                        Button3Pressed          nil         {}
+}
+
+Playing
+{
+                        Button1Pressed          Stopped         {StopPlaying();}
+                        Button2Pressed          nil         {ChannelUp();}
+                        Button3Pressed          nil         {ChannelDown();}
+}
+
+%%

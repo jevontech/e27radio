@@ -1,0 +1,1 @@
+java -jar Smc.jar -c++ -d ../ StateMachine.sm

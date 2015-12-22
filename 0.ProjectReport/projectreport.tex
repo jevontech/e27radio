@@ -42,19 +42,19 @@ Online project archive:
 
 
 \section{What is E27radio}
-E27radio is a device that makes internet radio accessible to everybody. It enables people from around the world to listen to music and news from many countries around the world. The E27 radio is extremely simple to use once it has been configured properly, so it can be used by anybody, no matter age or education. 
+E27radio is a device that makes internet radio accessible to everybody. It enables people  to listen to music and news from many countries around the world. The E27 radio is extremely simple to use once it has been configured properly, so it can be used by anybody, no matter age or education. 
 \begin{figure}[h]
 	\includegraphics[width=400px]{images/overview}
 	\caption{E27 radio}
 \end{figure}
 
 \section{Background}
-E27radio was developed as an entry for the Elektor Edison Challenge (end of 2015). I wanted to improve my software development skills for this type of devices, that's why I decided to take part in this competition.
+E27radio was developed as an entry for the Elektor Edison Challenge (end of 2015). I decided to take part in this competition in order to improve my product development skills and learn more about software development for embedded Linux.
 My idea was to use the Intel Edison to build a basic internet radio.
 Th initial plan was to use a external DAC(Digital to Analalog converter) in order to create an "analog out" signal that could be input for any audio amplifier.
 I ordered a Audio Codec Board from MikroElektronika. It connects to the Intel Edison using I2C for configuration and I2S for the data. 
-Direclt from the start I ran into problems trying to use the I2C and I2s bus.
-I don't own a logic analyzer, so it was really difficult to see what was actually going wrong on the I2C bus. I gave up after a few weeks...
+Right from the start I ran into problems trying to use the I2C and I2s bus.
+I don't own a logic analyzer, so it was really difficult to see what was actually going wrong on the I2C bus. I gave up after a couple of weeks...
 
 \begin{figure}[h]
 	\includegraphics[width=400px]{images/audio1}
@@ -63,7 +63,7 @@ I don't own a logic analyzer, so it was really difficult to see what was actuall
 
 I then decided to take a step back and rethink the whole project.
 As the Intel Edison features both WLAN and Bluetooth, I might as well use both in this project. 
-So I decided to build an internet radio that actually streams to a Bluetooth speaker. This introduced a lot of new challenges , as you can read in the rest of this report.
+So I decided to build an internet radio that actually streams to a Bluetooth speaker. This introduced a lot of new challenges , as you can read in the rest of this report. I decided to call the project E27radio..
 
 
 \chapter{Design and development}
@@ -83,7 +83,7 @@ The application software runs on Yocto Linux (the default for Intel Edison) and 
 
 
 \section{Software overview}
-In order to play audio streams via Bluetooth to external speakers, several software functionalities are required.
+In order to play audio streams via Bluetooth to external speakers, several software functionalities are required. Fortunately there is a lot of open source software out there: we just need to find all the bits and pieces and then integrate them in to 1 application.
 
 First of all we need to be able to connect to an Internet radio stream and decode it. This requires a audio player that is able to decode  most common Internet radio audio streams (e.g. MP3). For this I chose "mpg123" (\url{http://mpg123.org/}). Another set of tools is required to actually push this audio stream to a Bluetooth speaker. 
 After some research on the Internet, I decided to go for a setup using PulseAudio.
@@ -147,29 +147,25 @@ Look for a name that looks like:
 	\begin{verbatim}
 	bluez_sink.XX_XX_XX_XX_XX_XX_XX
 	\end{verbatim}
-
-
-Now we need to set that sink as the default:
+We need to set that sink as the default:
 	\begin{verbatim}
 	pactl set-default-sink bluez_sink.XX_XX_XX_XX_XX_XX_XX 
 	\end{verbatim}
-
-Now we can select an audio stream from the Internet and play it :
+Now we can finally select an audio stream from the Internet and play it :
 	\begin{verbatim}
 mpg123  http://pub1.radiotunes.com:80/radiotunes_tophits
 	\end{verbatim}
-
 This works, so the idea of playing audio via Bluetooth with a Intel Edison is feasible.
 
 \section{Software development}
-I decided to use my Linux PC for the software development for this project, because I already use it for "BitBaking" the Edison image.
+I decided to use my Linux PC for the software development in this project, because I already use it for "BitBaking" the Edison image. 
 I first used bitbake to create a development toolchain for Linux 64bit. This toolchain is required to cross-compile the software for the Intel Edison platform.
-Cmake (\url{http://cmake.org/}) will be used as the build tool for this project , as I have used it before and I am somewhat familiar with it.
+Cmake (\url{http://cmake.org/}) will be used as the build tool for this project: I have used it before in other projects.
 Cmake has the advantage that I don't need to write makefiles by hand and it should be fairly easy to switch between crosscompiling using the toolchain and building the software using bitbake.
 I created a "toolchain file" that provides cmake with all the information to generate Makefiles that use the compilers for the Intel Edison platform(cross compilation). 
 
 \subsection{Audio playback}
-Because mpg123 seemed to work quite well in the feasibility phase I will use mpg123 in the E27-radio software as well. mpg123 includes a C library that can be used by other projects, but I was not quite sure how to use it.
+Because mpg123 seemed to work quite well in the feasibility phase I will use mpg123 in the E27radio software as well. mpg123 includes a C library that can be used by other projects, but I was not quite sure how to integrate it in my own software.
 I found some ispiration online (\url{http://hzqtc.github.io/2012/05/play-mp3-with-libmpg123-and-libao.html}) and decided to go for a similar approach with curl, libmpg123 and libao. 
 Curl downloads the data, libmpg123 decodes it and then libao plays it.
 But I do need to some extra bits and pieces... 
@@ -180,15 +176,16 @@ The audio playback needs to run in a seperate thread in order to keep the user i
 The software for E27radio needs to be able to connect the Intel Edison to a Bluetooth speaker, similar to what we did earlier using the 'bluetoothctl' tool.
 In order to do this, the E27radio software needs to 'talk' to the Bluez Bluetooth stack. 
 This was one of the hardest parts of the project, as there is almost no information or example code available. 
-As far as I could tell, Bluez5 uses only D-Bus for it's API, so I needed to learn how to use D-Bus as well.
-D-bus is a message bus system for IPC and RPC. It should be cross-platform, but it is currently only used on Linux, as far as I could tell.
+As far as I could tell, Bluez5(the default version in the Intel Edison image) uses only D-Bus for it's API, so I needed to learn how to use D-Bus as well.
+D-bus  (\url{http://dbus.freedesktop.org}) is a message bus system for IPC and RPC. It should be cross-platform, but it is currently only used on Linux, as far as I could tell.
 I started looking for any D-Bus library that had a nice clean C++ API, but most D-Bus libraries are a bit outdated and C based (for example libdbus).
 I then found out that Qt also has a D-Bus library. The interface seemed nice and clean, so decided to use Qt. 
 Qt is normally used for applications that have a graphical user interface, but it should be possible to use it for "embedded applications" as well.
 
-In order to use Qt5 in my project, I needed to include Qt5 in the bitbake project for Intel Edison. For this I started with the Qt5 bitbake layer from the OpenEmbedded project (https://github.com/meta-qt5/meta-qt5 ). I had to make some changes to the configuration in order to force that no GUI related stuff for Qt5 would be build and then I was able to successfully compile Qt5 for my Intel Edison image. 
+In order to use Qt5 in my project, I needed to include Qt5 in the bitbake project for Intel Edison. This way I can build the require Qt5 libraries, so I can link my own application to those libraries.
+For this I started with the Qt5 bitbake layer from the OpenEmbedded project (https://github.com/meta-qt5/meta-qt5 ). I had to make some changes in the configuration in order to get Qt5 build for the Intel Edison platform and then I was able to successfully compile Qt5 for my Intel Edison image. 
 
-The Pulse audio sink also needs to be configured, so I created a small class that finds the 'bluez\_sink' and sets it as the default sink. This shouldn't be required if the Bluetooth device has been used before, but I'll do it anyway. In this class I just call an external executable (pactl) , because this was the fastest way to get it working.
+The Pulse audio sink also needs to be configured, so I created a small class that finds the 'bluez\_sink' and sets it as the default sink. This shouldn't be required if the Bluetooth device has been used before, but I'll do it on every connect. In this class I just call an external executable (pactl) , because this was the fastest way to get it working.
 
 \subsection{User interface}
 The user interface for this project is very simple: it consists of
@@ -203,6 +200,7 @@ The user interface for this project is very simple: it consists of
 \end{figure}
 
 The 3 pushbuttons are mounted on an Arduino proto shield and are "active-high" (this means 0V signal when the button is not pressed and 5V signal when the button is pressed).
+In order to access GPIO in my application, I used the MRAA library.
 Each button is connected to a digital pin on the arduino header (pin 2, pin 3 and pin 4).In my software I am configuring these pins as input pins. Furthermore interrupts are used to handle a button press.
 I didn't implement any button debouncing in hardware, so I just added simple debouncing in software using a timer.
 
@@ -223,16 +221,16 @@ This also enables easy extensions of the sourcecode in the future.
 
 
 \chapter{Conclusion}
-The development of the E27radio was a bumpy road, but it works quite well in the end. I just had enough time to finish a first basic prototype of E27-radio in time for the contest and I already identified quite a few things that still need to be done :
+The development of the E27radio was a bumpy road, but it works quite well in the end. I was able to complete this first basic prototype of E27-radio just in time for the contest and I already identified quite a few things that still need to be done. For example:
 \begin{itemize}
 	\item Include e27radio bitbake recipe in the image
 	\item Implement/improve exception handling in software 
-	(currently only 'happy flow' is supported)
+	(currently only very basic 'happy flow' is supported)
 	\item Simplify setup procedure (currently the initial setup needs to be done via the command line , for example pairing the Intel Edison with a Bluetooth device).
 	\item Implement extraction of metadata from Internet radio streams (for example title and artist for the current song)
 	\item Volume control for the radio stream
 \end{itemize}
-I hope this project helps other people to build their own internet radio (or any other application for that matter). The Intel Edison is a good platform for building an internet radio, as it has Wifi, Bluetooth and enough processing power. The only disadvantage is that its limited graphical processing capablities make it more difficult to use a graphical LCD in the user interface for an Internet radio client.
+I hope this project helps/inspires other people to build their own internet radio (or any other application for that matter). The Intel Edison is a nice platform for building an internet radio, as it has Wifi, Bluetooth and enough processing power. The only disadvantage is that its limited graphical processing capabilities make it more difficult to use a graphical LCD in the user interface for an Internet radio client.
 
 \begin{appendices}
 

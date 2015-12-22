@@ -1,5 +1,7 @@
 # E27radio
 
+![E27radio](https://raw.githubusercontent.com/jevontech/e27radio/master/0.ProjectReport/images/overview.jpg)
+
 This Github repository contains the sourcecode for the E27radio application.
 E27radio is an internet radio client based on the Intel Edison platform.
 
